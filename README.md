@@ -72,6 +72,7 @@ The FastApi server will be running on [http://127.0.0.1:8000](http://127.0.0.1:8
 - Find data sources for ski maps (Legendary Ski Artist James Niehues)
 - Find data sources for ski encylopedia (Top 10 ski books)
 - Deployment
+- Document potential RAG model
 - Tests?
 
 
