@@ -1,0 +1,9 @@
+uvicorn
+fastapi
+python-multipart
+pillow
+langchain
+chromadb
+anthropic
+openai
+python-dotenv
