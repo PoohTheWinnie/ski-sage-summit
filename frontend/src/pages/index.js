@@ -1,4 +1,3 @@
-'use client';
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar/Sidebar';
 import ChatArea from '../components/Chat/ChatArea';
@@ -34,4 +33,4 @@ export default function Home() {
       />
     </div>
   );
-}
+} 
