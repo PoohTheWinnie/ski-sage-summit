@@ -1,15 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from rag_manager import RAGManager
 import uvicorn
+from typing import Optional
 
 app = FastAPI()
 
-# Add CORS middleware
+# Add CORS middleware with production URL
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",  # Development
+        "https://ski-sage-summit.vercel.app",  # Production - adjust this to your actual domain
+        "*"  # Temporarily allow all origins for testing
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,21 +25,48 @@ rag_manager = RAGManager()
 
 class ChatRequest(BaseModel):
     message: str
-    modelType: str  # Keeping this for backward compatibility
+    modelType: Optional[str] = None  # Make modelType optional with default None
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     """Handle chat requests using RAG system"""
-    print('request', request)
+    if not request.message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+        
     try:
+        # Log incoming request
+        print(f"Processing chat request: {request.message[:100]}...")  # Log first 100 chars
+        
         # Using RAG system regardless of model type
         response = rag_manager.generate_response(request.message)
-        print('response', response)
-        return {"response": response}
+        
+        # Validate response
+        if not response:
+            raise HTTPException(status_code=500, detail="Failed to generate response")
+            
+        # Log success
+        print(f"Successfully generated response: {response[:100]}...")  # Log first 100 chars
+        
+        return {
+            "response": response,
+            "status": "success"
+        }
+        
     except Exception as e:
-        print(f"Error processing request: {e}")
-        return {"error": "An error occurred processing your request"}
+        # Log the full error
+        print(f"Error processing request: {str(e)}")
+        
+        # Return a proper error response
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred processing your request: {str(e)}"
+        )
+
+# Add a health check endpoint
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
-    # First-time setup
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -70,12 +70,37 @@ The project uses a sophisticated text processing pipeline to prepare documents f
    - Documents can contain ski-related information, guides, or encyclopedic content
 
 2. **Processing Pipeline**
-   - The pipeline processes documents through several stages:
-     1. **Text Extraction**: Extracts raw text from PDFs and TXT files
-     2. **Document Processing**: Processes and stores extracted text with metadata
-     3. **Chunking**: Splits documents into smaller, semantically meaningful chunks
-     4. **Vector Embedding**: Converts text chunks into vector embeddings
-     5. **Storage**: Stores embeddings in Pinecone vector database
+   The pipeline processes documents through several stages:
+
+   a. **Text Extraction & Processing**
+      - Extracts raw text from PDFs and TXT files
+      - Preserves document structure
+      - Stores processed documents with metadata
+
+   b. **Text Chunking**
+      - Chunk Size: 1000 characters
+      - Overlap: 200 characters
+      - Intelligent splitting using recursive character text splitter
+      - Preserves semantic boundaries using multiple separators:
+        - Paragraphs (\n\n)
+        - Lines (\n)
+        - Sentences (., !, ?)
+        - Clauses (,)
+        - Words ( )
+
+   c. **Vector Embedding**
+      - Uses all-MiniLM-L6-v2 (384 dimensions) from chroma
+      - Batch processing (100 chunks per batch)
+      - Each chunk stored with:
+        - Unique ID
+        - Vector embedding
+        - Metadata (title, source, chunk index)
+
+   d. **Storage**
+      - Vector store: Pinecone (serverless, AWS us-east-1)
+      - Processed documents: `data/texts/processed/`
+      - Text chunks: `data/texts/chunks/`
+      - Vector embeddings: Stored in Pinecone index
 
 3. **Running the Pipeline**
    ```bash
@@ -86,31 +111,75 @@ The project uses a sophisticated text processing pipeline to prepare documents f
    python backend/text_processor.py
    ```
 
-4. **Configuration**
-   - Chunk size: 1000 characters
-   - Chunk overlap: 200 characters
-   - Embedding model: all-MiniLM-L6-v2 (384 dimensions) from chroma
-   - Vector store: Pinecone (serverless, AWS us-east-1)
-
-5. **Output**
-   - Processed documents: `data/texts/processed/`
-   - Text chunks: `data/texts/chunks/`
-   - Vector embeddings: Stored in Pinecone index
-
 The processed data is used by the Ski Encyclopedia Mode to provide accurate, context-aware responses to skiing-related queries.
 
-## Agents
+## Encyclopedia RAG Model
 
-- Ski Encycopedia Mode
-- Ski Map Creator Mode
+The Ski Encyclopedia Mode uses a sophisticated Retrieval-Augmented Generation (RAG) system to provide accurate, context-aware responses to skiing-related queries. Here's a detailed breakdown of how it works:
 
-## Roadmap
+### Architecture Overview
 
-- Users
-- Storage of chats
-- Find data sources for ski maps (Legendary Ski Artist James Niehues)
-- Document potential RAG model
-- Tests?
+1. **Embedding Model**
+   - Model: all-MiniLM-L6-v2 (384 dimensions)
+   - Implementation: SentenceTransformer via ChromaDB
+   - Purpose: Converts text chunks and queries into semantic vectors
+
+2. **Vector Database**
+   - Platform: Pinecone (Serverless)
+   - Index Configuration:
+     - Metric: Cosine Similarity
+     - Dimensions: 384
+     - Region: AWS us-east-1
+
+3. **Language Model**
+   - Model: GPT-4 Turbo
+   - Role: Expert skiing instructor and guide
+   - Temperature: 0.7 (balanced between creativity and accuracy)
+
+### Processing Pipeline
+
+1. **Document Processing**
+   - Supports PDF and TXT formats
+   - Extracts clean text while preserving structure
+   - Stores processed documents with metadata
+
+2. **Text Chunking**
+   - Chunk Size: 1000 characters
+   - Overlap: 200 characters
+   - Intelligent splitting using recursive character text splitter
+   - Preserves semantic boundaries using multiple separators:
+     - Paragraphs (\n\n)
+     - Lines (\n)
+     - Sentences (., !, ?)
+     - Clauses (,)
+     - Words ( )
+
+3. **Vector Embedding**
+   - Batch processing (100 chunks per batch)
+   - Each chunk stored with:
+     - Unique ID
+     - Vector embedding
+     - Metadata (title, source, chunk index)
+
+### Query Pipeline
+
+1. **Query Processing**
+   - User query converted to embedding vector
+   - Semantic search in Pinecone index
+   - Retrieves top 5 most relevant chunks
+
+2. **Context Assembly**
+   - Combines retrieved chunks
+   - Maintains original text integrity
+   - Preserves source attribution
+
+3. **Response Generation**
+   - System prompt enforces:
+     - Practical, actionable advice
+     - Clear technical explanations
+     - Safety considerations
+     - Proper skiing terminology
+   - Generates responses grounded in retrieved context
 
 
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
