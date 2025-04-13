@@ -22,15 +22,30 @@ export default function Home() {
         setSelectedConversation={setSelectedConversation}
         setMessages={setMessages}
       />
-      <ChatArea 
-        messages={messages}
-        currentStreamingMessage={currentStreamingMessage}
-        selectedConversation={selectedConversation}
-        input={input}
-        setInput={setInput}
-        handleSubmit={handleSubmit}
-        isLoading={isLoading}
-      />
+      <div className="flex-1 flex flex-col items-center justify-center">
+        {
+          messages.length === 0 && (
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-blue-900 mb-3">
+                Your Ultimate Skiing Encyclopedia
+              </h1>
+            </div>
+          )
+        }
+
+        {/* Centered Chat Area */}
+        <div className="w-full max-w-3xl px-4">
+          <ChatArea 
+            messages={messages}
+            currentStreamingMessage={currentStreamingMessage}
+            selectedConversation={selectedConversation}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
+        </div>
+      </div>
     </div>
   );
 } 

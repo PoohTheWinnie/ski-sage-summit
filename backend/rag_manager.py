@@ -1,56 +1,103 @@
-from typing import List, Dict
-import os
-from anthropic import Anthropic
+from pathlib import Path
+from typing import List
+from pinecone import Pinecone, ServerlessSpec
+from openai import OpenAI
 from dotenv import load_dotenv
-from .image_processor import ImageProcessor
-from .vector_store import VectorStore
+import os
+from chromadb.utils import embedding_functions
 
 load_dotenv()
 
 class RAGManager:
-    def __init__(self):
-        self.image_processor = ImageProcessor()
-        self.vector_store = VectorStore()
-        self.anthropic = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
-
-    async def process_and_store_map(self, image_path: str, metadata: Dict):
-        """Process a ski map and store its information"""
-        # Generate description from image
-        description = self.image_processor.process_image(image_path)
+    def __init__(self, data_dir: str = "data/texts"):
+        self.data_dir = Path(data_dir)
+        self.index_name = "ski-sage-summit"
         
-        # Store in vector database
-        self.vector_store.add_document(
-            id=metadata['name'],
-            description=description,
-            metadata=metadata
+        # Initialize Pinecone
+        if not os.getenv("PINECONE_API_KEY"):
+            raise ValueError("PINECONE_API_KEY environment variable is not set")
+            
+        # Create Pinecone instance with new API
+        self.pc = Pinecone(
+            api_key=os.getenv("PINECONE_API_KEY")
         )
         
-        return {"status": "success", "description": description}
-
-    async def query_and_generate(self, query: str) -> str:
-        """Query the vector store and generate a response"""
-        # Get relevant contexts
-        results = self.vector_store.query(query)
+        # Get or create Pinecone index
+        if self.index_name not in self.pc.list_indexes().names():
+            self.pc.create_index(
+                name=self.index_name,
+                dimension=384,  # Default dimension for all-MiniLM-L6-v2
+                metric="cosine",
+                spec=ServerlessSpec(
+                    cloud="aws",
+                    region='us-east-1'
+                ) 
+            )
+        self.index = self.pc.Index(self.index_name)
         
-        # Construct prompt with retrieved information
-        context = "\n".join(results['documents'][0])
-        
-        prompt = f"""You are a ski resort expert assistant. Use the following context about ski maps to answer the question.
-        
-Context: {context}
-
-Question: {query}
-
-Please provide a detailed response about the ski trails and features mentioned in the question."""
-
-        # Generate response using Claude
-        response = self.anthropic.messages.create(
-            model="claude-3-opus-20240229",
-            max_tokens=1000,
-            messages=[{
-                "role": "user",
-                "content": prompt
-            }]
+        # Initialize ChromaDB embeddings
+        self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name="all-MiniLM-L6-v2"
         )
         
-        return response.content[0].text 
+        # Initialize OpenAI client
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.model = "gpt-4-turbo"
+        
+        # Define system prompt
+        self.system_prompt = """You are an expert skiing instructor and guide. Use the following relevant information from skiing books and manuals to answer the user's question. Be specific and detailed in your response, citing techniques and concepts from the source material.
+
+Context information:
+{context}
+
+Remember to:
+1. Focus on practical, actionable advice
+2. Explain techniques clearly and systematically
+3. Include safety considerations when relevant
+4. Use proper skiing terminology
+"""
+
+    def retrieve_relevant_chunks(self, query: str, k: int = 5) -> List[str]:
+        """Retrieve relevant chunks for a query"""
+        # Generate embeddings for the query
+        query_embedding = self.embedding_function([query])[0].tolist()  # Convert numpy array to list
+        
+        # Query Pinecone
+        results = self.index.query(
+            vector=query_embedding,
+            top_k=k,
+            include_metadata=True
+        )
+        
+        # Extract texts from results
+        texts = [match.metadata['text'] for match in results.matches]
+        return texts
+
+    def generate_response(self, query: str) -> str:
+        """Generate a response using RAG"""
+        # Retrieve relevant chunks
+        relevant_chunks = self.retrieve_relevant_chunks(query)
+        
+        # Combine chunks into context
+        context = "\n\n".join(relevant_chunks)
+        
+        # Format system prompt with context
+        formatted_system_prompt = self.system_prompt.format(context=context)
+        
+        # Generate response using OpenAI
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": formatted_system_prompt},
+                {"role": "user", "content": query}
+            ],
+            temperature=0.7
+        )
+        
+        return response.choices[0].message.content
+    
+
+if __name__ == "__main__":
+    rag_manager = RAGManager()
+    response = rag_manager.generate_response("What is the best way to ski a black diamond?")
+    print(response)

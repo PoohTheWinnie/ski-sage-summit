@@ -5,7 +5,7 @@ export default function Sidebar({ selectedConversation, setSelectedConversation,
     <div className="w-80 bg-white border-r border-[#e2e8f0] p-6 flex flex-col">
       {/* Logo and Title Area */}
       <div className="mb-8 flex flex-col items-center">
-        <div className="w-12 h-12 mb-3 rounded-xl bg-gradient-to-br from-[#2c5282] to-[#4299e1] flex items-center justify-center">
+        <div className="w-12 h-12 mb-3 flex items-center justify-center">
           <Image src="/logo.png" alt="Ski Sage Summit Logo" width={48} height={48} />
         </div>
         <h1 className="text-2xl font-bold text-[#1a202c] tracking-tight">Ski Sage</h1>

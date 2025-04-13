@@ -1,7 +1,6 @@
 export default function ModelToggle({ selectedModel, setSelectedModel }) {
   return (
     <div className="flex items-center gap-3 mb-3">
-      <span className="text-sm text-[#64748b]">Mode:</span>
       <div className="flex rounded-lg border border-[#e2e8f0] p-0.5 bg-[#f8fafc]">
         <button
           onClick={() => setSelectedModel('encyclopedia')}

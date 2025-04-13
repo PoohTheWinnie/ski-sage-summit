@@ -60,6 +60,45 @@ The FastApi server will be running on [http://127.0.0.1:8000](http://127.0.0.1:8
 
 ## Data Sources
 
+### Text Processing Pipeline
+
+The project uses a sophisticated text processing pipeline to prepare documents for the RAG (Retrieval-Augmented Generation) system. Here's how it works:
+
+1. **Document Collection**
+   - Place your source documents (PDF or TXT files) in the `data/texts` directory
+   - Supported formats: PDF and TXT files
+   - Documents can contain ski-related information, guides, or encyclopedic content
+
+2. **Processing Pipeline**
+   - The pipeline processes documents through several stages:
+     1. **Text Extraction**: Extracts raw text from PDFs and TXT files
+     2. **Document Processing**: Processes and stores extracted text with metadata
+     3. **Chunking**: Splits documents into smaller, semantically meaningful chunks
+     4. **Vector Embedding**: Converts text chunks into vector embeddings
+     5. **Storage**: Stores embeddings in Pinecone vector database
+
+3. **Running the Pipeline**
+   ```bash
+   # Ensure you have set up your environment variables
+   export PINECONE_API_KEY='your-api-key'
+   
+   # Run the processing pipeline
+   python backend/text_processor.py
+   ```
+
+4. **Configuration**
+   - Chunk size: 1000 characters
+   - Chunk overlap: 200 characters
+   - Embedding model: all-MiniLM-L6-v2 (384 dimensions) from chroma
+   - Vector store: Pinecone (serverless, AWS us-east-1)
+
+5. **Output**
+   - Processed documents: `data/texts/processed/`
+   - Text chunks: `data/texts/chunks/`
+   - Vector embeddings: Stored in Pinecone index
+
+The processed data is used by the Ski Encyclopedia Mode to provide accurate, context-aware responses to skiing-related queries.
+
 ## Agents
 
 - Ski Encycopedia Mode
@@ -70,8 +109,6 @@ The FastApi server will be running on [http://127.0.0.1:8000](http://127.0.0.1:8
 - Users
 - Storage of chats
 - Find data sources for ski maps (Legendary Ski Artist James Niehues)
-- Find data sources for ski encylopedia (Top 10 ski books)
-- Deployment
 - Document potential RAG model
 - Tests?
 
