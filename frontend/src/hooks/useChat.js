@@ -4,7 +4,7 @@ export default function useChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
+  const [error, setError] = useState(null);
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -21,6 +21,7 @@ export default function useChat() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/chat', {
@@ -34,6 +35,11 @@ export default function useChat() {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to get response');
+      }
+
       const data = await response.json();
       
       if (isMounted.current) {
@@ -43,8 +49,9 @@ export default function useChat() {
         }]);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Chat Error:', error);
       if (isMounted.current) {
+        setError(error.message);
         setMessages(prev => [...prev, { 
           role: 'assistant', 
           content: 'Sorry, there was an error processing your request.' 
@@ -63,7 +70,7 @@ export default function useChat() {
     input,
     setInput,
     isLoading,
-    currentStreamingMessage,
+    error,
     handleSubmit
   };
 } 
