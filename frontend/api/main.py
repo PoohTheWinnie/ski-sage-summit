@@ -26,6 +26,9 @@ class ChatRequest(BaseModel):
     message: str
     modelType: Optional[str] = None  # Make modelType optional with default None
 
+class SummarizeRequest(BaseModel):
+    messages: list[str]
+
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     """Handle chat requests using RAG system"""
@@ -54,6 +57,44 @@ async def chat(request: ChatRequest):
     except Exception as e:
         # Log the full error
         print(f"Error processing request: {str(e)}")
+        
+        # Return a proper error response
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred processing your request: {str(e)}"
+        )
+
+@app.post("/api/summarize")
+async def summarize(request: SummarizeRequest):
+    """Summarize a list of messages into a brief description"""
+    if not request.messages:
+        raise HTTPException(status_code=400, detail="Messages list cannot be empty")
+    
+    try:
+        # Combine messages into a single prompt
+        combined_prompt = (
+            "Please provide a brief 3-5 word summary of these messages:\n" + 
+            "\n".join(f"- {msg}" for msg in request.messages)
+        )
+        
+        # Use RAG manager to generate summary
+        summary = rag_manager.generate_response(combined_prompt)
+        
+        # Validate response
+        if not summary:
+            raise HTTPException(status_code=500, detail="Failed to generate summary")
+            
+        # Log success
+        print(f"Successfully generated summary: {summary}")
+        
+        return {
+            "summary": summary,
+            "status": "success"
+        }
+        
+    except Exception as e:
+        # Log the full error
+        print(f"Error processing summarization request: {str(e)}")
         
         # Return a proper error response
         raise HTTPException(
