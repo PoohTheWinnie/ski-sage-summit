@@ -35,7 +35,6 @@ async def chat(request: ChatRequest):
     if not request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     
-    
     try:
         print(f"Processing chat request: {request.message[:100]}...")  # Log first 100 chars
 

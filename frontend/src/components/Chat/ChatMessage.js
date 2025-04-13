@@ -39,7 +39,7 @@ export default function ChatMessage({ message, isStreaming }) {
   };
 
   return (
-    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}>
+    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       {/* Hidden measure element */}
       <div
         ref={measureRef}
@@ -49,18 +49,20 @@ export default function ChatMessage({ message, isStreaming }) {
       
       <div
         ref={contentRef}
-        className={`rounded-md p-4 break-words transition-all duration-200 ${
-          message.role === 'user'
-            ? 'bg-gradient-to-r from-[#2c5282] to-[#4299e1] text-white' 
-            : 'bg-[#f1f5f9] text-[#1a202c]'
-        } prose prose-sm max-w-none`}
-        style={{ width: 'auto' }}
+        className={`rounded-md p-4 break-words transition-all duration-200 prose prose-sm max-w-none`}
+        style={{
+          width: 'auto',
+          background: message.role === 'user' 
+            ? 'linear-gradient(to right, #1B3B4B, #2C5D7C)' 
+            : '#E6EEF2',
+          color: message.role === 'user' ? '#E6EEF2' : '#0F2634'
+        }}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {message.content}
         </ReactMarkdown>
         {isStreaming && (
-          <span className="inline-block w-1 h-4 ml-1 bg-[#1a202c] animate-pulse"/>
+          <span className="inline-block w-1 h-4 ml-1 animate-pulse" style={{ backgroundColor: '#1B3B4B' }}/>
         )}
       </div>
     </div>

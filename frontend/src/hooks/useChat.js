@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 export default function useChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [chatId, setChatId] = useState(null);
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -13,25 +14,35 @@ export default function useChat() {
     };
   }, []);
 
-  const handleSubmit = async (e, modelType) => {
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
+
+  const handleSubmit = useCallback(async (e, modelType) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     const userMessage = { role: 'user', content: input };
+    const userInput = input; // Store a copy to avoid closure issues
+    
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/chat', {
+      // Use absolute URL for production
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/chat`;
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          message: input,
-          modelType: modelType
+          message: userInput,
+          modelType: modelType,
+          chatId: chatId
         }),
       });
 
@@ -62,7 +73,7 @@ export default function useChat() {
         setIsLoading(false);
       }
     }
-  };
+  }, [input, chatId]);
 
   return {
     messages,
@@ -71,6 +82,8 @@ export default function useChat() {
     setInput,
     isLoading,
     error,
+    chatId,
+    setChatId,
     handleSubmit
   };
 } 

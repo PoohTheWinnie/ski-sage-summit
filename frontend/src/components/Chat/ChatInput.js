@@ -28,7 +28,7 @@ export default function ChatInput({
 
   return (
     <div className="w-full">
-      <div className="relative flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="relative flex flex-col rounded-2xl bg-white shadow-sm">
         {/* Textarea */}
         <textarea
           ref={textareaRef}
@@ -36,9 +36,10 @@ export default function ChatInput({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="How can I help you today?"
-          className="w-full mx-2 my-3 resize-none bg-transparent text-gray-700 outline-none"
+          className="w-full mx-2 my-3 resize-none bg-transparent outline-none"
           style={{
-            minHeight: '72px' // 3 lines at roughly 24px per line
+            minHeight: '72px', // 3 lines at roughly 24px per line
+            color: '#0F2634'
           }}
         />
 
@@ -48,7 +49,14 @@ export default function ChatInput({
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
           />
-          <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-center" onClick={handleSubmit}>
+          <button 
+            className="p-1 rounded-lg transition-colors flex items-center justify-center" 
+            style={{ 
+              color: '#1B3B4B',
+              ':hover': { backgroundColor: '#E6EEF2' } 
+            }} 
+            onClick={handleSubmit}
+          >
             <MountainSnow />
           </button>
         </div>
