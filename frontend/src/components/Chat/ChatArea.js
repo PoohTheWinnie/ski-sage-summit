@@ -29,12 +29,12 @@ export default function ChatArea({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white h-full max-h-screen">
+    <div className="flex-1 flex flex-col h-full max-h-screen">
       {/* Empty State with Centered Content */}
       {hasMessages ? (
         <>
           {/* Messages Container - Set explicit height and enable scrolling */}
-          <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-hide">
             <div className="max-w-3xl mx-auto space-y-6 p-6">
               {messages.map((message, index) => (
                 <div key={index} className="flex justify-center">
@@ -59,7 +59,7 @@ export default function ChatArea({
           </div>
 
           {/* Input Area - Fixed at bottom */}
-          <div className="w-full border-t border-gray-100 bg-white">
+          <div className="w-full border-t border-gray-100">
             <div className="max-w-3xl mx-auto px-6 py-4">
               <ChatInput 
                 input={input}

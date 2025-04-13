@@ -34,12 +34,11 @@ async def chat(request: ChatRequest):
     """Handle chat requests using RAG system"""
     if not request.message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-        
+    
+    
     try:
-        # Log incoming request
         print(f"Processing chat request: {request.message[:100]}...")  # Log first 100 chars
-        
-        # Using RAG system regardless of model type
+
         response = rag_manager.generate_response(request.message)
         
         # Validate response
@@ -107,3 +106,6 @@ async def summarize(request: SummarizeRequest):
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

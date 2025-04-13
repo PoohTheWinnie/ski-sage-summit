@@ -99,5 +99,6 @@ Remember to:
 
 if __name__ == "__main__":
     rag_manager = RAGManager()
+    print(os.getenv("PINECONE_API_KEY"))
     response = rag_manager.generate_response("What is the best way to ski a black diamond?")
     print(response)
