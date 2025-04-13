@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ChatMessage({ message, isStreaming }) {
   const contentRef = useRef(null);
@@ -47,18 +49,20 @@ export default function ChatMessage({ message, isStreaming }) {
       
       <div
         ref={contentRef}
-        className={`rounded-md p-4 whitespace-pre-wrap break-words transition-all duration-200 ${
+        className={`rounded-md p-4 break-words transition-all duration-200 ${
           message.role === 'user'
             ? 'bg-gradient-to-r from-[#2c5282] to-[#4299e1] text-white' 
             : 'bg-[#f1f5f9] text-[#1a202c]'
-        }`}
+        } prose prose-sm max-w-none`}
         style={{ width: 'auto' }}
       >
-        {message.content}
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {message.content}
+        </ReactMarkdown>
         {isStreaming && (
           <span className="inline-block w-1 h-4 ml-1 bg-[#1a202c] animate-pulse"/>
         )}
       </div>
     </div>
   );
-} 
+}

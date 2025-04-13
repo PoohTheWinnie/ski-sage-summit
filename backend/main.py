@@ -11,9 +11,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # Development
-        "https://ski-sage-summit.vercel.app",  # Production - adjust this to your actual domain
-        "*"  # Temporarily allow all origins for testing
+        "https://ski-sage-summit.vercel.app",  # Production
+        "http://localhost:3000"  # Development
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -67,6 +66,3 @@ async def chat(request: ChatRequest):
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

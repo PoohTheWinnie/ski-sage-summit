@@ -11,46 +11,36 @@ export default function Sidebar({ selectedConversation, setSelectedConversation,
         <h1 className="text-2xl font-bold text-[#1a202c] tracking-tight">Ski Sage</h1>
       </div>
       
+      {/* New Chat Button */}
       <button 
-        className="w-full bg-gradient-to-r from-[#2c5282] to-[#4299e1] text-white rounded-xl p-3.5 mb-6 transition-all hover:shadow-lg hover:opacity-90 font-medium"
+        className="flex items-center gap-3 w-full rounded-full px-4 py-3 text-[#2c5282] hover:bg-[#f1f5f9] transition-colors"
         onClick={() => {
           setMessages([]);
           setSelectedConversation('New Chat');
         }}
       >
-        New Conversation
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#2c5282] to-[#4299e1] text-white">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3.33334V12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M3.33331 8H12.6666" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <span className="font-medium">New chat</span>
       </button>
       
       {/* Recent Conversations */}
-      <div className="flex-1 overflow-y-auto">
-        <h2 className="text-sm font-medium text-[#64748b] uppercase tracking-wider mb-3">Recent Chats</h2>
-        <div className="space-y-1">
-          {['Ski Equipment Guide', 'Trail Recommendations', 'Weather Analysis'].map((chat) => (
+      <div className="flex-1 overflow-y-auto mt-6">
+        {selectedConversation !== 'New Chat' && (
+          <div className="space-y-1">
             <button
-              key={chat}
-              className={`w-full text-left p-3 rounded-lg transition-all ${
-                selectedConversation === chat 
-                  ? 'bg-[#f1f5f9] text-[#1a202c] font-medium' 
-                  : 'hover:bg-[#f8fafc] text-[#64748b]'
-              }`}
-              onClick={() => setSelectedConversation(chat)}
+              className="w-full text-left p-3 rounded-lg bg-[#f1f5f9] text-[#1a202c] font-medium"
+              onClick={() => setSelectedConversation(selectedConversation)}
             >
-              {chat}
+              {selectedConversation}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Settings Area */}
-      <div className="pt-4 border-t border-[#e2e8f0]">
-        <button className="w-full text-left p-3 rounded-lg hover:bg-[#f8fafc] text-[#64748b] flex items-center gap-2">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          Settings
-        </button>
+          </div>
+        )}
       </div>
     </div>
   );
-} 
+}
