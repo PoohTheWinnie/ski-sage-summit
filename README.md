@@ -81,7 +81,12 @@ The Ski Encyclopedia Mode uses a sophisticated Retrieval-Augmented Generation sy
 ### Map Generation RAG Model
 The Trail Map Mode leverages a specialized RAG system for retrieving and generating custom ski trail maps. Using CLIP image embeddings and DALL-E 3, it can create personalized trail maps based on user requirements like terrain type, difficulty level, and specific features. This combination of retrieval and generation produces accurate, visually appealing maps tailored to user preferences.
 
-### Text Processing Pipeline
+
+## Architecture
+
+![alt text](diagram.png)
+
+## Text Processing Pipeline
 The project uses a sophisticated text processing pipeline to prepare documents for the RAG (Retrieval-Augmented Generation) system. Here's how it works:
 
 1. **Document Collection**
