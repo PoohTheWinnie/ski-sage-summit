@@ -1,0 +1,37 @@
+{
+  "data/maps/sunshine-goats-eye.png": {
+    "name": "sunshine-goats-eye",
+    "features": [
+      "expert terrain"
+    ],
+    "difficulty_levels": []
+  },
+  "data/maps/alpine-back-side-trail.png": {
+    "name": "alpine-back-side-trail",
+    "features": [
+      "back side trails"
+    ],
+    "difficulty_levels": []
+  },
+  "data/maps/lake-louise.png": {
+    "name": "lake-louise",
+    "features": [
+      "lake views"
+    ],
+    "difficulty_levels": []
+  },
+  "data/maps/alpine-front-side-trail.png": {
+    "name": "alpine-front-side-trail",
+    "features": [
+      "front side trails"
+    ],
+    "difficulty_levels": []
+  },
+  "data/maps/palisadesmapmain2324.png": {
+    "name": "palisadesmapmain2324",
+    "features": [
+      "palisades resort"
+    ],
+    "difficulty_levels": []
+  }
+}
