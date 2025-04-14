@@ -13,7 +13,6 @@ This section should list any major frameworks/libraries used to bootstrap your p
 * [![Next][Next.js]][Next-url]
 * [![React][React.js]][React-url]
 * [![FastAPI][FastAPI]][FastAPI-url]
-* [![PostgreSQL][PostgreSQL]][PostgreSQL-url]
 * [![TailwindCSS][TailwindCSS]][TailwindCSS-url]
 
 
@@ -272,7 +271,5 @@ The Trail Map Mode uses an advanced Retrieval-Augmented Generation (RAG) system 
 [React-url]: https://reactjs.org/
 [FastAPI]: https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
 [FastAPI-url]: https://fastapi.tiangolo.com/
-[PostgreSQL]: https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white
-[PostgreSQL-url]: https://www.postgresql.org/
 [TailwindCSS]: https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white
 [TailwindCSS-url]: https://tailwindcss.com/
