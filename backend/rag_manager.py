@@ -35,14 +35,16 @@ class RAGManager:
             )
         self.index = self.pc.Index(self.index_name)
         
-        # Initialize ChromaDB embeddings
+        # Initialize ChromaDB embeddings with caching
         self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name="all-MiniLM-L6-v2"
         )
+        self.embedding_cache = {}  # Add embedding cache
         
         # Initialize OpenAI client
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.model = "gpt-4-turbo"
+        # Use a faster model option
+        self.model = "gpt-3.5-turbo"  # Change from gpt-4-turbo for faster responses
         
         # Define system prompt
         self.system_prompt = """You are an expert skiing instructor and guide. Use the following relevant information from skiing books and manuals to answer the user's question. Be specific and detailed in your response, citing techniques and concepts from the source material.
@@ -59,8 +61,14 @@ Remember to:
 
     def retrieve_relevant_chunks(self, query: str, k: int = 5) -> List[str]:
         """Retrieve relevant chunks for a query"""
-        # Generate embeddings for the query
-        query_embedding = self.embedding_function([query])[0].tolist()  # Convert numpy array to list
+        # Check cache first
+        if query in self.embedding_cache:
+            query_embedding = self.embedding_cache[query]
+        else:
+            # Generate embeddings for the query
+            query_embedding = self.embedding_function([query])[0].tolist()
+            # Cache the embedding
+            self.embedding_cache[query] = query_embedding
         
         # Query Pinecone
         results = self.index.query(
@@ -73,7 +81,7 @@ Remember to:
         texts = [match.metadata['text'] for match in results.matches]
         return texts
 
-    def generate_response(self, query: str) -> str:
+    def generate_response(self, query: str, model_override: str = None) -> str:
         """Generate a response using RAG"""
         # Retrieve relevant chunks
         relevant_chunks = self.retrieve_relevant_chunks(query)
@@ -84,9 +92,12 @@ Remember to:
         # Format system prompt with context
         formatted_system_prompt = self.system_prompt.format(context=context)
         
+        # Use model override if provided
+        model_to_use = model_override if model_override else self.model
+        
         # Generate response using OpenAI
         response = self.client.chat.completions.create(
-            model=self.model,
+            model=model_to_use,
             messages=[
                 {"role": "system", "content": formatted_system_prompt},
                 {"role": "user", "content": query}
