@@ -17,15 +17,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 
 ## Getting Started Locally
-
-First, create and activate a virtual environment:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Then, install the dependencies:
+Frontend: Install the dependencies:
 
 ```bash
 npm install
@@ -33,6 +25,24 @@ npm install
 yarn
 # or
 pnpm install
+```
+
+Then, run the development server
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Backend: environment setup and local server
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r backend/requirements.txt
+python3 main.py
 ```
 
 ### Environment Variables
@@ -49,20 +59,6 @@ Create a `.env` file in the frontend directory
 ```bash
 NEXT_PUBLIC_BACKEND_URL=
 ```
-
-Then, run the development server (python dependencies will be installed automatically here):
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-The FastApi server will be running on [http://127.0.0.1:8000](http://127.0.0.1:8000) – feel free to change the port in `package.json` (you'll also need to update it in `next.config.js`).
 
 ## Data Sources
 
