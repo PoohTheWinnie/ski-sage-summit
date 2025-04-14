@@ -8,7 +8,7 @@ from chromadb.utils import embedding_functions
 
 load_dotenv()
 
-class RAGManager:
+class EncyclopediaRAG:
     def __init__(self, data_dir: str = "data/texts"):
         self.data_dir = Path(data_dir)
         self.index_name = "ski-sage-summit"
@@ -44,7 +44,7 @@ class RAGManager:
         # Initialize OpenAI client
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         # Use a faster model option
-        self.model = "gpt-3.5-turbo"  # Change from gpt-4-turbo for faster responses
+        self.model = "gpt-4-turbo"  # Change from gpt-4-turbo for faster responses
         
         # Define system prompt
         self.system_prompt = """You are an expert skiing instructor and guide. Use the following relevant information from skiing books and manuals to answer the user's question. Be specific and detailed in your response, citing techniques and concepts from the source material.
@@ -109,7 +109,7 @@ Remember to:
     
 
 if __name__ == "__main__":
-    rag_manager = RAGManager()
+    encyclopedia_rag = EncyclopediaRAG()
     print(os.getenv("PINECONE_API_KEY"))
-    response = rag_manager.generate_response("What is the best way to ski a black diamond?")
+    response = encyclopedia_rag.generate_response("What is the best way to ski a black diamond?")
     print(response)

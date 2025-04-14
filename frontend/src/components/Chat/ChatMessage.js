@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Image from 'next/image';
 
 export default function ChatMessage({ message, isStreaming }) {
   const contentRef = useRef(null);
   const measureRef = useRef(null);
+  const isImage = message.content.includes("https://oaidalleapiprodscus.blob.core.windows.net/");
 
   useEffect(() => {
     adjustWidth();
@@ -17,7 +19,7 @@ export default function ChatMessage({ message, isStreaming }) {
     const content = contentRef.current;
     const measure = measureRef.current;
     
-    if (content && measure) {
+    if (content && measure && !isImage) {
       // Reset width to get natural content width
       content.style.width = 'auto';
       measure.textContent = message.content;
@@ -26,8 +28,8 @@ export default function ChatMessage({ message, isStreaming }) {
       const parentWidth = content.parentElement.offsetWidth;
       const maxWidth = Math.min(parentWidth, 600); // Maximum width of 600px
       
-      if (lines.length > 1) {
-        // Use full width (with max-width) for multiline messages
+      if (lines.length > 1 || imageUrl) {
+        // Use full width (with max-width) for multiline messages or with images
         content.style.width = `${maxWidth}px`;
       } else {
         // For single line, adjust to content width
@@ -40,7 +42,6 @@ export default function ChatMessage({ message, isStreaming }) {
 
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-      {/* Hidden measure element */}
       <div
         ref={measureRef}
         className="absolute invisible whitespace-pre p-4"
@@ -58,12 +59,27 @@ export default function ChatMessage({ message, isStreaming }) {
           color: message.role === 'user' ? '#E6EEF2' : '#0F2634'
         }}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {message.content}
-        </ReactMarkdown>
-        {isStreaming && (
-          <span className="inline-block w-1 h-4 ml-1 animate-pulse" style={{ backgroundColor: '#1B3B4B' }}/>
-        )}
+        { 
+          isImage ? (
+            <div className="mt-3">
+              <a href={message.content} target="_blank" rel="noopener noreferrer">
+                <div className="relative w-full h-64 rounded-md overflow-hidden">
+                  <Image
+                    src={message.content}
+                    alt="Map result"
+                    className="object-contain "
+                    width={600}
+                    height={600}
+                  />
+                </div>
+              </a>
+            </div>
+          ) : (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
+          )
+        }
       </div>
     </div>
   );

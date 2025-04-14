@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from rag_manager import RAGManager
+from encyclopedia_rag import EncyclopediaRAG
+from map_rag import MapRAG
 import uvicorn
 from typing import Optional
 
@@ -20,14 +21,11 @@ app.add_middleware(
 )
 
 # Initialize RAG manager
-rag_manager = RAGManager()
-
+encyclopedia_rag = EncyclopediaRAG()
+map_rag = MapRAG()
 class ChatRequest(BaseModel):
     message: str
-    modelType: Optional[str] = None  # Make modelType optional with default None
-
-class SummarizeRequest(BaseModel):
-    messages: list[str]
+    modelType: str
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
@@ -36,16 +34,18 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     
     try:
-        print(f"Processing chat request: {request.message[:100]}...")  # Log first 100 chars
-
-        response = rag_manager.generate_response(request.message)
+        if request.modelType == "encyclopedia":
+            response = encyclopedia_rag.generate_response(request.message)
+        elif request.modelType == "map":
+            response = map_rag.generate_enhanced_map(request.message)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid model type")
         
         # Validate response
         if not response:
             raise HTTPException(status_code=500, detail="Failed to generate response")
             
-        # Log success
-        print(f"Successfully generated response: {response[:100]}...")  # Log first 100 chars
+        print(response)
         
         return {
             "response": response,
@@ -61,50 +61,6 @@ async def chat(request: ChatRequest):
             status_code=500,
             detail=f"An error occurred processing your request: {str(e)}"
         )
-
-@app.post("/api/summarize")
-async def summarize(request: SummarizeRequest):
-    """Summarize a list of messages into a brief description"""
-    if not request.messages:
-        raise HTTPException(status_code=400, detail="Messages list cannot be empty")
-    
-    try:
-        # Combine messages into a single prompt
-        combined_prompt = (
-            "Please provide a brief 3-5 word summary of these messages:\n" + 
-            "\n".join(f"- {msg}" for msg in request.messages)
-        )
-        
-        # Use RAG manager to generate summary
-        summary = rag_manager.generate_response(combined_prompt)
-        
-        # Validate response
-        if not summary:
-            raise HTTPException(status_code=500, detail="Failed to generate summary")
-            
-        # Log success
-        print(f"Successfully generated summary: {summary}")
-        
-        return {
-            "summary": summary,
-            "status": "success"
-        }
-        
-    except Exception as e:
-        # Log the full error
-        print(f"Error processing summarization request: {str(e)}")
-        
-        # Return a proper error response
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred processing your request: {str(e)}"
-        )
-
-# Add a health check endpoint
-@app.get("/api/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

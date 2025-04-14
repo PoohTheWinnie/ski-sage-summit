@@ -14,10 +14,6 @@ export default function useChat() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(messages);
-  }, [messages]);
-
   const handleSubmit = useCallback(async (e, modelType) => {
     e.preventDefault();
     if (!input.trim()) return;
