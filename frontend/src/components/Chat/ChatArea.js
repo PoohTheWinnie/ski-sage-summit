@@ -74,7 +74,7 @@ export default function ChatArea({
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1 className="text-4xl font-bold mb-3" style={{ color: '#1B3B4B' }}>
-            Your Ultimate Skiing Encyclopedia
+            Your Ultimate Skiing Buddy
           </h1>
           <div className="w-full max-w-xl px-4">
             <ChatInput 

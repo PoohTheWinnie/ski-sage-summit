@@ -13,7 +13,6 @@ export default function Home() {
     input,
     setInput,
     isLoading,
-    chatId,
     setChatId,
     handleSubmit
   } = useChat();
