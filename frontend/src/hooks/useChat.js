@@ -32,7 +32,7 @@ export default function useChat() {
 
     try {
       // Use absolute URL for production
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/chat`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chat`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
