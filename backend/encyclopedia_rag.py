@@ -5,6 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 from chromadb.utils import embedding_functions
+import time
 
 load_dotenv()
 
@@ -44,7 +45,7 @@ class EncyclopediaRAG:
         # Initialize OpenAI client
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         # Use a faster model option
-        self.model = "gpt-4-turbo"  # Change from gpt-4-turbo for faster responses
+        self.model = "chatgpt-4o-latest"  # Change from gpt-4-turbo for faster responses
         
         # Define system prompt
         self.system_prompt = """You are an expert skiing instructor and guide. Use the following relevant information from skiing books and manuals to answer the user's question. Be specific and detailed in your response, citing techniques and concepts from the source material.
@@ -84,7 +85,10 @@ Remember to:
     def generate_response(self, query: str, model_override: str = None) -> str:
         """Generate a response using RAG"""
         # Retrieve relevant chunks
+        start_time = time.time()
         relevant_chunks = self.retrieve_relevant_chunks(query)
+        end_time = time.time()
+        print(f"Time taken to retrieve relevant chunks: {end_time - start_time} seconds")
         
         # Combine chunks into context
         context = "\n\n".join(relevant_chunks)
@@ -96,20 +100,20 @@ Remember to:
         model_to_use = model_override if model_override else self.model
         
         # Generate response using OpenAI
+        start_time = time.time()
         response = self.client.chat.completions.create(
             model=model_to_use,
             messages=[
                 {"role": "system", "content": formatted_system_prompt},
                 {"role": "user", "content": query}
             ],
-            temperature=0.7
+            
         )
-        
+        end_time = time.time()
+        print(f"Time taken to generate response: {end_time - start_time} seconds")
         return response.choices[0].message.content
     
 
 if __name__ == "__main__":
     encyclopedia_rag = EncyclopediaRAG()
-    print(os.getenv("PINECONE_API_KEY"))
     response = encyclopedia_rag.generate_response("What is the best way to ski a black diamond?")
-    print(response)
